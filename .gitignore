@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+sprouts-demo/
+.idea/
+.vscode/
+
+# Environment variables
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Streamlit cache
+.streamlit/
+
+# Qdrant and Redis volumes (if using volume mounts)
+qdrant_storage/
+redis_data/
+
+# Docker
+*.pid
+*.db
+*.sock
+*.sqlite
+*.bak
+*.tar
+*.gz
+*.swp
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Misc
+*.zip
+*.egg-info/

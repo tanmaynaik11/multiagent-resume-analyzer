@@ -1,4 +1,4 @@
-# 🤖 Multi-Agent Resume-JD Skill Matching System
+# 🤖 Multi-Agent Resume-JD Analyzer System
 
 An intelligent, production-ready AI system that leverages **LangGraph**, **Qdrant**, **SentenceTransformers**, and **FastAPI** to perform accurate and explainable skill matching between a candidate's resume and job descriptions. Also includes a Streamlit-based frontend for easy interaction.
 

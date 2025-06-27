@@ -7,6 +7,10 @@ from fastapi import FastAPI
 from app.models import MatchingInput, OrchestratorState, RecruiterMatchInput
 from app.langgraph_flow import build_graph
 
+# import mlflow
+# mlflow.set_tracking_uri("file:///absolute/path/to/mlruns") 
+# mlflow.set_experiment("Resume-JD Matching")
+
 logger = get_logger("MainApp")
 
 redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
@@ -15,9 +19,20 @@ client_openai = OpenAI(api_key=OPENAI_API_KEY)
 app = FastAPI()
 graph = build_graph()
 
+# def log_matching_to_mlflow(state: OrchestratorState):
+#     with mlflow.start_run():
+#         mlflow.log_param("resume_text_snippet", state.resume_text[:100])
+#         mlflow.log_param("jd_text_snippet", state.jd_text[:100])
+#         mlflow.log_metric("matching_score", state.matching_score or 0)
+#         mlflow.log_metric("experience_years", state.total_experience_years or 0)
+#         mlflow.log_text(str(state.resume_skills), "resume_skills.txt")
+#         mlflow.log_text(str(state.jd_skills), "jd_skills.txt")
+#         mlflow.log_text(str(state.skill_gap), "skill_gap.txt")
+
 @app.post("/multiagent_match/")
 async def match_route(input: MatchingInput):
     logger.info("Received matching request")
+    # log_matching_to_mlflow(final_state)
     state = OrchestratorState(resume_text=input.resume_text, jd_text=input.jd_text)
     output = graph.invoke(state)
     final = OrchestratorState(**output)
@@ -35,7 +50,7 @@ async def match_route(input: MatchingInput):
 @app.post("/recruiter_match/")
 async def recruiter_match_route(payload: RecruiterMatchInput):
     logger.info(f"Received recruiter match request with {len(payload.resumes)} resumes")
-
+    # log_matching_to_mlflow(final_state)
     results = []
     for resume in payload.resumes:
         try:

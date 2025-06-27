@@ -33,3 +33,13 @@ class OrchestratorState(BaseModel):
     total_experience_years: Optional[float] = None
     matching_score: Optional[float] = None
     skill_gap: List[str] = []
+    recruiter_instructions: Optional[str] = ""
+
+class ResumeEntry(BaseModel):
+    filename: str
+    text: str
+
+class RecruiterMatchInput(BaseModel):
+    jd_text: str
+    resumes: List[ResumeEntry]
+    instructions: Optional[str] = ""

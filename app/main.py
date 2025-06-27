@@ -4,7 +4,7 @@ import redis
 from openai import OpenAI
 import qdrant_client
 from fastapi import FastAPI
-from app.models import MatchingInput, OrchestratorState
+from app.models import MatchingInput, OrchestratorState, RecruiterMatchInput
 from app.langgraph_flow import build_graph
 
 logger = get_logger("MainApp")
@@ -31,3 +31,32 @@ async def match_route(input: MatchingInput):
         "matching_score": final.matching_score,
         "skill_gap": final.skill_gap
     }
+
+@app.post("/recruiter_match/")
+async def recruiter_match_route(payload: RecruiterMatchInput):
+    logger.info(f"Received recruiter match request with {len(payload.resumes)} resumes")
+
+    results = []
+    for resume in payload.resumes:
+        try:
+            state = OrchestratorState(resume_text=resume.text, jd_text=payload.jd_text, recruiter_instructions=payload.instructions)
+            output = graph.invoke(state)
+            final = OrchestratorState(**output)
+
+            results.append({
+                "Filename": resume.filename,
+                "Matching Score (%)": round(final.matching_score * 100, 2),
+                "Experience (Years)": final.total_experience_years,
+                "Skill Gap": ", ".join(final.skill_gap)
+            })
+
+        except Exception as e:
+            logger.error(f"Error processing resume {resume.filename}: {str(e)}")
+            results.append({
+                "Filename": resume.filename,
+                "Matching Score (%)": "Error",
+                "Experience (Years)": "Error",
+                "Skill Gap": "Error"
+            })
+
+    return {"matches": results}
